@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/keitaro1020/go-gin-gorm-sqlite3-example/domain"
-	"github.com/keitaro1020/go-gin-gorm-sqlite3-example/repository"
 	"net/http"
 )
 
@@ -14,7 +13,7 @@ type CreateBookRequest struct {
 	Price  uint32 `json:"price,omitempty" binding:"required"`
 }
 
-func (h *Handler) CreateBook(gc *gin.Context) {
+func (h *HandlerImpl) CreateBook(gc *gin.Context) {
 
 	req := &CreateBookRequest{}
 	if err := gc.Bind(req); err != nil {
@@ -23,9 +22,7 @@ func (h *Handler) CreateBook(gc *gin.Context) {
 	}
 
 	if err := h.Transaction(gc, func(tx *gorm.DB, gc *gin.Context) error {
-
-		br := repository.GetBookRepository()
-		bk, err := br.Create(tx, &domain.Book{
+		bk, err := h.bookRepository.Create(tx, &domain.Book{
 			Title:  req.Title,
 			Author: req.Author,
 			Price:  req.Price,
@@ -42,9 +39,8 @@ func (h *Handler) CreateBook(gc *gin.Context) {
 	}
 }
 
-func (h *Handler) GetBooks(gc *gin.Context) {
-	br := repository.GetBookRepository()
-	bks, err := br.FindAll(db)
+func (h *HandlerImpl) GetBooks(gc *gin.Context) {
+	bks, err := h.bookRepository.FindAll(db)
 	if err != nil {
 		NewErrorResponse(err).render(gc)
 		return

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/keitaro1020/go-gin-gorm-sqlite3-example/repository"
 	"gopkg.in/go-playground/validator.v8"
 	"log"
 	"net/http"
@@ -12,8 +13,15 @@ import (
 	"time"
 )
 
-type Handler struct {
-	Config *Config
+type Handler interface {
+	Hello(gc *gin.Context)
+	CreateBook(gc *gin.Context)
+	GetBooks(gc *gin.Context)
+}
+
+type HandlerImpl struct {
+	config         *Config
+	bookRepository repository.BookRepository
 }
 
 type Config struct {
@@ -39,10 +47,12 @@ func SetDb(d *gorm.DB) {
 	db = d
 }
 
-func NewHandler(cfg *Config) (*Handler, error) {
-	return &Handler{
-		Config: cfg,
-	}, nil
+func NewHandler(cfg *Config) (Handler, error) {
+	var handler Handler = &HandlerImpl{
+		config:         cfg,
+		bookRepository: repository.GetBookRepository(),
+	}
+	return handler, nil
 }
 
 func NewErrorResponse(err error) *ErrorResponse {
@@ -109,7 +119,7 @@ func ErrorCode(err error) int {
 	return http.StatusInternalServerError
 }
 
-func (h *Handler) Transaction(c *gin.Context, txFunc func(*gorm.DB, *gin.Context) error) (err error) {
+func (h *HandlerImpl) Transaction(c *gin.Context, txFunc func(*gorm.DB, *gin.Context) error) (err error) {
 	tx := db.Begin()
 	defer func() {
 		if p := recover(); p != nil {

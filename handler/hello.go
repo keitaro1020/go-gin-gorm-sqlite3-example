@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) Hello(gc *gin.Context) {
+func (h *HandlerImpl) Hello(gc *gin.Context) {
 	res := &struct {
 		Value string
 	}{
