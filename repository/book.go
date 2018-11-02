@@ -20,10 +20,10 @@ func GetBookRepository() BookRepository {
 }
 
 type BookRecord struct {
+	gorm.Model
 	Title  string
 	Author string
 	Price  uint32
-	gorm.Model
 }
 
 func (r *BookRecord) TableName() string {
@@ -83,12 +83,12 @@ func (re *BookRepositoryImpl) Delete(db *gorm.DB, id uint) error {
 
 func (re *BookRepositoryImpl) toRecord(b *domain.Book) *BookRecord {
 	return &BookRecord{
-		Title:  b.Title,
-		Author: b.Author,
-		Price:  b.Price,
 		Model: gorm.Model{
 			ID: b.ID,
 		},
+		Title:  b.Title,
+		Author: b.Author,
+		Price:  b.Price,
 	}
 }
 
