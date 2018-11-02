@@ -1,0 +1,8 @@
+.envrc
+vendor/
+.idea/
+
+!.gitkeep
+
+database.sqlite3
+*.iml
