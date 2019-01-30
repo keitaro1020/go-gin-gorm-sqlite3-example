@@ -44,8 +44,11 @@ func main() {
 	r.GET("/hello", h.Hello)
 
 	// book
-	r.POST("/book", h.CreateBook)
-	r.GET("/book", h.GetBooks)
+	b := r.Group("/book")
+	{
+		b.POST("", h.CreateBook)
+		b.GET("", h.GetBooks)
+	}
 
 	r.Run(fmt.Sprintf(":%v", cfg.AppConfig.Port))
 }

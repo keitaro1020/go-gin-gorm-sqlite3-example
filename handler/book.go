@@ -16,7 +16,7 @@ type CreateBookRequest struct {
 func (h *HandlerImpl) CreateBook(gc *gin.Context) {
 
 	req := &CreateBookRequest{}
-	if err := gc.Bind(req); err != nil {
+	if err := gc.ShouldBind(req); err != nil {
 		NewErrorResponse(err).render(gc)
 		return
 	}
